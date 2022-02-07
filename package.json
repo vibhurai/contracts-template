@@ -14,7 +14,8 @@
     "yeah": "npm run cbuild && npm run cdep",
     "yeahh": "npm run cbuild && npm run cdevdep",
     "cdep": "near deploy --accountId=$CONTRACT --wasmFile=./build/release/notes.wasm",
-    "cdevdep": "near dev-deploy --wasmFile=./build/release/notes.wasm"
+    "cdevdep": "near dev-deploy --wasmFile=./build/release/notes.wasm",
+    "del": "near delete $CONTRACT $OWNER && near create-account notes.$OWNER --masterAccount $OWNER"
   },
   "keywords": [],
   "author": "ka",
