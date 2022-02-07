@@ -1,95 +1,144 @@
-import { Note } from './modules'
+import { Note, notes } from './modules'
 import { Context, logging, PersistentSet } from "near-sdk-as"
 import { AccountId } from '../../utils';
-import { Vector, Set } from './ds_utils';
 
 @nearBindgen
 export class Contract {
   private owner: AccountId;
-  private accounts: Set<AccountId> = new Set<AccountId>("p");
-
 
   constructor(master: AccountId) {
     this.owner = master;
-    this.accounts.add(master);
-    logging.log(this.accounts.size)
   }
 
-  ret(): number {
-    return this.accounts.size;
+  ret(): void {
+    logging.log(Context.sender + " " + Context.predecessor);
+
   }
 
   @mutateState()
   create(note: string): bool {
-    this.assert_owner();
+    let note_bucket = notes.get(Context.sender);
+    let new_note = new Note();
 
-    let temp = new Note();
-    temp.edit(note, notes.length, false);
+    if (note_bucket == null) {
+      logging.log("here");
+      let notesArray = new Array<Note>();
+      new_note.edit(note, 0, false);
 
-    notes.pushBack(temp);
+      notesArray.push(new_note);
+      notes.set(Context.sender, notesArray);
+    }
+    else {
+      new_note.edit(note, note_bucket.length, false);
+      note_bucket.push(new_note);
+      notes.set(Context.sender, note_bucket);
+    }
+
     return true;
   }
 
   @mutateState()
-  edit(content: string, note: string, append: bool): bool {
-    this.assert_owner();
+  shareNote_new(target_account_id: AccountId, content: string): void {
+    const note_bucket = notes.get(target_account_id);
+    const new_note = new Note();
 
-    let a = "string";
+    if (note_bucket == null) {
+      const notesArray = new Array<Note>();
+      new_note.edit(content, 0, false);
+      new_note.set_share(Context.predecessor);
+
+      notesArray.push(new_note);
+      notes.set(target_account_id, notesArray);
+    }
+    else {
+      new_note.edit(content, note_bucket.length, false);
+      new_note.set_share(Context.predecessor);
+
+      note_bucket.push(new_note);
+      notes.set(target_account_id, note_bucket);
+    }
+  }
+
+  @mutateState()
+  edit(content: string, note: string, append: bool): bool {
+    const note_bucket = notes.get(Context.sender);
+
     let i = 0;
 
-    for (i; i < notes.length; i++) {
-      if (notes[i].get_content().includes(content)) {
-        if (append)
-          notes[i].edit(note, -1, true);
-        else
-          notes[i].edit(note, -1, false);
-        break;
+    if (note_bucket != null) {
+      for (i; i < note_bucket.length; i++) {
+        if (note_bucket[i].get_content().includes(content)) {
+          if (append)
+            note_bucket[i].edit(note, -1, true);
+          else
+            note_bucket[i].edit(note, -1, false);
+          break;
+        }
       }
-    }
 
-    // Note not found
-    if (i != notes.length)
-      return true;
+      notes.set(Context.sender, note_bucket);
+
+      // Note found
+      if (i != note_bucket.length)
+        return true;
+    }
 
     return false;
   }
 
   @mutateState()
   delete(content: string): bool {
-    this.assert_owner();
+    const note_bucket = notes.get(Context.sender);
 
-    for (let i = 0; i < notes.length; i++) {
-      if (notes[i].get_content() == content)
-        notes.swap_remove(i);
+    let i = 0;
+
+    if (note_bucket != null) {
+      for (i; i < note_bucket.length; i++) {
+        if (note_bucket[i].get_content().includes(content)) {
+          note_bucket.splice(i, 1);
+          notes.set(Context.sender, note_bucket);
+
+          return true;
+        }
+      }
     }
 
-    return true;
+    return false;
   }
 
-  // Clears all the notes
+  // Clears the database 
   @mutateState()
   clear(): void {
     this.assert_owner();
-
-    while (notes.length > 0)
-      notes.pop();
+    notes.clear()
   }
 
-  @mutateState()
-  add_caller(account: AccountId): void {
-    this.assert_owner();
-    logging.log("here");
-    this.accounts.add(account);
-  }
 
   list(): Array<Note> {
-    this.assert_owner();
-    return notes.get_all();
+    const note_bucket = notes.get(Context.sender);
+
+    if (note_bucket != null) {
+      return note_bucket;
+    }
+
+    let temp = new Array<Note>();
+
+    return temp;
   }
 
   get(content: string): Note {
-    this.assert_owner();
-    return notes.get_one(content);
+    const note_bucket = notes.get(Context.sender);
+
+    let i = 0;
+
+    if (note_bucket != null) {
+      for (i; i < note_bucket.length; i++) {
+        if (note_bucket[i].get_content().includes(content))
+          return note_bucket[i];
+      }
+    }
+
+    return new Note();
   }
 
   // --------------------------------------------------------------------------
@@ -97,16 +146,9 @@ export class Contract {
   // --------------------------------------------------------------------------
 
   private assert_owner(): void {
-    // let caller = Context.sender;
-    let t = true;
     assert(
-      // this.accounts.has(Context.sender),
-      t == true,
+      Context.sender == this.owner,
       'Only the owner of this contract may call this method'
     );
   }
-
-
 }
-
-const notes: Vector<Note> = new Vector<Note>("n");
