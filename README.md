@@ -78,11 +78,11 @@ function clear(): void
 
 To deploy the contract for development, follow these steps:
 
-1. clone this repo locally
-2. run `yarn` to install dependencies
-3. run `yarn dev-dep` to deploy the contract (this uses `near dev-deploy`)
-4. run `export CONTRACT=<the ID of your dev account>`
-5. you can also deploy the contract to a specified account by using `yarn dep` but first, you would need to initialise a '$CONTRACT' variable with the name of the account the contract would be deployed to
+1. Clone this repo locally.
+2. Run `yarn` to install dependencies.
+3. Run `yarn dev-dep` to deploy the contract (this uses `near dev-deploy`).
+4. Run `export CONTRACT=<the ID of your dev account>`.
+5. You can also deploy the contract to a specified account by using `yarn dep`.
 
 **Your contract is now ready to use.**
 
