@@ -92,50 +92,50 @@ _Public commands_
 
 - Create a note on the mentioned account ID
 
-```sh
-near call $CONTRACT create '{"note": "<string>"}' --accountId <your account ID>
-```
+  ```sh
+  near call $CONTRACT create '{"note": "<string>"}' --accountId <your account ID>
+  ```
 
 - Edit a note on the mentioned account ID
 
-```sh
-near call $CONTRACT edit '{"content": "<string>","note": "<string>", "append": true/false}' --accountId <your account ID>
-```
+  ```sh
+  near call $CONTRACT edit '{"content": "<string>","note": "<string>", "append": true/false}' --accountId <your account ID>
+  ```
 
 - Delete a note on the mentioned account ID
 
-```sh
-near call $CONTRACT delete '{"content": "<string>"}' --accountId <your account ID>
-```
+  ```sh
+  near call $CONTRACT delete '{"content": "<string>"}' --accountId <your account ID>
+  ```
 
 - Get a note with the mentioned account ID
 
-```sh
-near call $CONTRACT get '{"content": "<string>"}' --accountId <your account ID>
-```
+  ```sh
+  near call $CONTRACT get '{"content": "<string>"}' --accountId <your account ID>
+  ```
 
 - Share a note with the mentioned account ID from your account
 
-```sh
-near call $CONTRACT shareNote_new '{"target_account_id": "<AccountID>", "content": "<string>"}' --accountId <your account ID>
-```
+  ```sh
+  near call $CONTRACT shareNote_new '{"target_account_id": "<AccountID>", "content": "<string>"}' --accountId <your account ID>
+  ```
 
 - List all the notes with the mentioned account ID
 
-```sh
-near call $CONTRACT list --accountId <your account ID>
-```
+  ```sh
+  near call $CONTRACT list --accountId <your account ID>
+  ```
 
 _Owner commands_
 
 - Initialise the contract with the master
 
-```sh
-near call $CONTRACT init '{"master": "'$CONTRACT'"}' --accountId $CONTRACT
-```
+  ```sh
+  near call $CONTRACT init '{"master": "'$CONTRACT'"}' --accountId $CONTRACT
+  ```
 
 - Clear the entire database across all accounts
 
-```sh
-near call $CONTRACT clear --accountId $CONTRACT
-```
+  ```sh
+  near call $CONTRACT clear --accountId $CONTRACT
+  ```
