@@ -30,7 +30,7 @@ function init(owner: AccountId, allow_anonymous: bool = true): void
 
 /**
  * give thanks to the owner of the contract
- * and optionally attach tokens
+ * @Params and optionally attach tokens
  */
 function say(message: string, anonymous: bool): bool
 
