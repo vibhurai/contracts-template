@@ -21,9 +21,8 @@ function init(master: AccountId): void
 // ====================================
 
 /**
- * Create a note
- *    @Params
- *    note: a string containing the content of the note
+ * give thanks to the owner of the contract
+ * @Params and optionally attach tokens
  */
 function create(note: string): bool
 
