@@ -11,8 +11,8 @@
     "test": "yarn build:release && yarn test:unit && yarn test:simulate",
     "test:simulate": "cargo test -- --nocapture",
     "clean": "rm -rf ./build && rm -rf ./neardev && rm -rf ./target",
-    "yeah": "npm run cbuild && npm run cdep",
-    "yeahh": "npm run cbuild && npm run cdevdep",
+    "dep": "npm run cbuild && npm run cdep",
+    "dev-dep": "npm run cbuild && npm run cdevdep",
     "cdep": "near deploy --accountId=$CONTRACT --wasmFile=./build/release/notes.wasm",
     "cdevdep": "near dev-deploy --wasmFile=./build/release/notes.wasm",
     "del": "near delete $CONTRACT $OWNER && near create-account notes.$OWNER --masterAccount $OWNER"

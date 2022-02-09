@@ -1,59 +1,77 @@
-# Thanks
+# Notes
 
-Say "thanks!" to other students of the NCD by calling _their_ instance of this contract.
-
-You can optionally attach tokens to your message, or even leave an anonymous tip.
-
-Of course keep in mind that your signing account will be visible on the blockchain via NEAR Explorer even if you send an anonymous message.
-
-## ⚠️ Warning
-
-Any content produced by NEAR, or developer resources that NEAR provides, are for educational and inspiration purposes only.  NEAR does not encourage, induce or sanction the deployment of any such applications in violation of applicable laws or regulations.
+A simple note taking contract with the basic CRUD operations and an option to share a note with another account on the network
 
 ## Contract
 
 ```ts
-// ------------------------------------
-// contract initialization
-// ------------------------------------
+// ====================================
+// CONTRACT INITIALISATION
+// ====================================
 
 /**
  * initialize contract with owner ID and other config data
  *
  * (note: this method is called "constructor" in the singleton contract code)
  */
-function init(owner: AccountId, allow_anonymous: bool = true): void
+function init(master: AccountId): void
 
-// ------------------------------------
-// public methods
-// ------------------------------------
-
-/**
- * give thanks to the owner of the contract
- * and optionally attach tokens
- */
-function say(message: string, anonymous: bool): bool
-
-// ------------------------------------
-// owner methods
-// ------------------------------------
+// ====================================
+// PUBLIC METHODS
+// ====================================
 
 /**
- * show all messages and users
+ * Create a note
+ *    @Params
+ *    note: a string containing the content of the note
  */
-function list(): Array<Message>
+function create(note: string): bool
 
 /**
- * generate a summary report
+ * Edit a note
+ *    @Params
+ *    content: partial content of the note to be edited
+ *    note: the new content, either to be appended to the earlier note or to replace the note
+ *    append: if the "note" is to replace the previous note or append to it
  */
-function summarize(): Contract
+function edit(content: string, note: string, append: bool): bool
 
 /**
- * transfer received funds to owner account
+ * Delete a note
+ *    @Params
+ *    content: partial content of the note to be deleted
  */
-function transfer(): void
+function delete(content: string): bool
+
+/**
+ * Get an existing note
+ *    @Params
+ *    content: partial content of the note to be fetched
+ */
+function get(content: string): Note
+
+/**
+ * List all the notes for an account
+ */
+function list(): Array<Note>
+
+/**
+ * Share a note to another account
+ *    @Params
+ *    target_account_id: the account the note is to be shared to,
+ *    content: content of the note to be shared
+ */
+function shareNote_new(target_account_id: AccountId, content: string): void
+
+// ====================================
+// OWNER METHOD(S)
+// ====================================
+
+/**
+ * Clear the entire database for all users
+ */
+function clear(): void
 ```
-
 
 ## Usage
 
@@ -63,39 +81,28 @@ To deploy the contract for development, follow these steps:
 
 1. clone this repo locally
 2. run `yarn` to install dependencies
-3. run `./scripts/1.dev-deploy.sh` to deploy the contract (this uses `near dev-deploy`)
+3. run `yarn dev-dep` to deploy the contract (this uses `near dev-deploy`)
+4. run `export CONTRACT=<the ID of your dev account>`
+5. you can also deploy the contract to a specified account by using `yarn dep` but first, you would need to initialise a '$CONTRACT' variable with the name of the account the contract would be deployed to
 
 **Your contract is now ready to use.**
 
 To use the contract you can do any of the following:
 
-_Public scripts_
+_Public commands_
 
 ```sh
-2.say-thanks.sh         # post a message saying thank you, optionally attaching NEAR tokens
-2.say-anon-thanks.sh    # post an anonymous message (otherwise same as above)
+near call $CONTRACT create '{"note": "<string>"}' --accountId <your account ID>             # Create a note on the mentioned account ID
+near call $CONTRACT edit '{"content": "<string>","note": "<string>", "append": true/false}' --accountId <your account ID>             # Edit a note on the mentioned account ID
+near call $CONTRACT delete '{"content": "<string>"}' --accountId <your account ID>             # Delete a note on the mentioned account ID
+near call $CONTRACT get '{"content": "<string>"}' --accountId <your account ID>             # Get a note with the mentioned account ID
+near call $CONTRACT shareNote_new '{"target_account_id": "<AccountID>", "content": "<string>"}' --accountId <your account ID>             # Share a note with the mentioned account ID from your account
+near call $CONTRACT list --accountId <your account ID>             # List all the notes with the mentioned account ID
 ```
 
-_Owner scripts_
+_Owner commands_
 
 ```sh
-o-report.sh             # generate a summary report of the contract state
-o-transfer.sh           # transfer received funds to the owner account
+near call $CONTRACT init '{"master": "'$CONTRACT'"}' --accountId $CONTRACT             # Initialise the contract with the master
+near call $CONTRACT clear --accountId $CONTRACT             # Clear the entire database across all accounts
 ```
-
-### Production
-
-It is recommended that you deploy the contract to a subaccount under your MainNet account to make it easier to identify you as the owner
-
-1. clone this repo locally
-2. run `./scripts/x-deploy.sh` to rebuild, deploy and initialize the contract to a target account
-
-   requires the following environment variables
-   - `NEAR_ENV`: Either `testnet` or `mainnet`
-   - `OWNER`: The owner of the contract and the parent account.  The contract will be deployed to `thanks.$OWNER`
-
-3. run `./scripts/x-remove.sh` to delete the account
-
-   requires the following environment variables
-   - `NEAR_ENV`: Either `testnet` or `mainnet`
-   - `OWNER`: The owner of the contract and the parent account.  The contract will be deployed to `thanks.$OWNER`
