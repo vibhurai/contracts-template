@@ -1,4 +1,4 @@
-# <Application name>
+# < Application name >
 
 A small description.
 
