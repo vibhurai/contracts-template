@@ -2,6 +2,8 @@
 
 A small description.
 
+A sample Readme can be found **[here](https://github.com/vibhurai/NEAR-Contract--Notes-app/blob/main/README.md)** 
+
 ## Contract
 (Contract methods with parameters and its types)
   
